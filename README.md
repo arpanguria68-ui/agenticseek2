@@ -17,7 +17,7 @@
 <img src="./media/demo_animation.gif" alt="AgentSeek 2 Animated Demo" width="800">
 </p>
 
-*Watch the UI cycle through all major features!*
+*6 features shown: Chat → Editor → Browser → Files → LM Studio → Light Mode*
 
 ---
 
@@ -28,19 +28,35 @@
 <img src="./media/demo_screenshot.png" alt="Chat Interface" width="800">
 </p>
 
-### 💻 Computer View - Editor with Code Execution
+*Natural conversation with Jarvis AI assistant!*
+
+### 💻 Editor View - Code Generation & Execution
 <p align="center">
 <img src="./media/demo_editor_view.png" alt="Editor View" width="800">
 </p>
 
 *Python code generation with live execution output!*
 
+### 🌐 Browser View - Web Browsing
+<p align="center">
+<img src="./media/demo_browser_view.png" alt="Browser View" width="800">
+</p>
+
+*Integrated web browser showing Google search!*
+
 ### 📁 Workspace Files Browser
 <p align="center">
 <img src="./media/demo_files_view.png" alt="Files Browser" width="800">
 </p>
 
-*Browse and manage your workspace files directly from the interface!*
+*Browse and manage your workspace files directly!*
+
+### ⚙️ LM Studio Integration
+<p align="center">
+<img src="./media/demo_lm_studio.png" alt="LM Studio Settings" width="800">
+</p>
+
+*Configure LM Studio as your local LLM provider with server address and model selection!*
 
 ### ☀️ Light Mode Theme
 <p align="center">
@@ -63,7 +79,7 @@
 | 🎙️ **Voice Enabled** | Speech-to-text for hands-free interaction |
 | 🌙 **Dark/Light Mode** | Beautiful UI with theme toggle |
 | 📁 **File Browser** | Explore and manage workspace files |
-| ⚙️ **Configurable** | Easy LLM provider setup |
+| ⚙️ **LM Studio** | Local LLM integration with easy configuration |
 
 ---
 
@@ -74,7 +90,7 @@
 - **Python 3.10.x** - [Download](https://www.python.org/downloads/release/python-3100/)
 - **Docker Desktop** - [Windows](https://docs.docker.com/desktop/install/windows-install/) | [Mac](https://docs.docker.com/desktop/install/mac-install/)
 - **Git** - [Download](https://git-scm.com/downloads)
-- **Ollama** or **LM Studio** for local LLM
+- **LM Studio** - [Download](https://lmstudio.ai/) (for local LLM)
 
 ### Installation
 
@@ -120,8 +136,8 @@ stealth_mode = True
 
 | Provider | Type | Description |
 |----------|------|-------------|
-| `ollama` | Local | Self-hosted LLM server |
 | `lm-studio` | Local | LM Studio desktop app |
+| `ollama` | Local | Self-hosted LLM server |
 | `openai` | API | OpenAI GPT models |
 | `google` | API | Google Gemini models |
 | `deepseek` | API | Deepseek models |
