@@ -12,19 +12,24 @@
 
 ## ✨ Demo
 
-### 🎬 Full Feature Walkthrough
-
 <p align="center">
-<img src="./media/full_demo.webp" alt="AgentSeek 2 Full Demo" width="800">
+<img src="./media/demo_screenshot.png" alt="AgentSeek 2 Demo" width="800">
 </p>
 
-*Watch Jarvis write code, browse the web, and manage files — all in one interface!*
+*Ask Jarvis anything — code, web search, file management, and more!*
 
-**Features Shown:** 💬 Chat Interface • 💻 Code Generation • 🌐 Browser View • 📝 Editor View • 📜 Chat History • 📁 File Browser • ⚙️ Settings • 🌙 Theme Toggle
+### 📺 Watch the Full Demo
+👉 [**Download Demo Video (WebP)**](./media/full_demo.webp) - Shows all features in action!
 
-<p align="center">
-<img src="./media/demo_screenshot.png" alt="AgentSeek 2 Screenshot" width="800">
-</p>
+**Features in the demo:**
+- 💬 Chat Interface with Jarvis AI
+- 💻 Code Generation (Python programs)
+- 🌐 Browser View with web search
+- 📝 Editor View for code editing
+- 📜 Chat History panel
+- 📁 File Browser for workspace
+- ⚙️ Settings modal for LLM configuration
+- 🌙 Theme Toggle (Light/Dark mode)
 
 ---
 
