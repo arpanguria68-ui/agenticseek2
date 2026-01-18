@@ -10,35 +10,44 @@
 
 ---
 
-## ✨ Screenshots
+## ✨ Demo
 
-### 🌙 Dark Mode - Chat Interface
+### 🎬 Animated Feature Tour
 <p align="center">
-<img src="./media/demo_screenshot.png" alt="AgentSeek 2 Dark Mode" width="800">
+<img src="./media/demo_animation.gif" alt="AgentSeek 2 Animated Demo" width="800">
 </p>
 
-*Chat with Jarvis AI - code generation, web search, and file management!*
+*Watch the UI cycle through all major features!*
 
-### ☀️ Light Mode - AI Conversation  
+---
+
+## 📸 Screenshots
+
+### 🌙 Chat Interface (Dark Mode)
 <p align="center">
-<img src="./media/demo_light_mode.png" alt="AgentSeek 2 Light Mode" width="800">
+<img src="./media/demo_screenshot.png" alt="Chat Interface" width="800">
 </p>
 
-*Switch between light and dark themes with one click!*
-
-### ⚙️ Settings - LLM Configuration
+### 💻 Computer View - Editor with Code Execution
 <p align="center">
-<img src="./media/demo_settings.png" alt="Settings Modal" width="800">
+<img src="./media/demo_editor_view.png" alt="Editor View" width="800">
 </p>
 
-*Configure your local LLM provider - supports Ollama, LM Studio, and more!*
+*Python code generation with live execution output!*
 
-### 📁 File Browser - Workspace Explorer
+### 📁 Workspace Files Browser
 <p align="center">
-<img src="./media/demo_files.png" alt="File Browser" width="800">
+<img src="./media/demo_files_view.png" alt="Files Browser" width="800">
 </p>
 
 *Browse and manage your workspace files directly from the interface!*
+
+### ☀️ Light Mode Theme
+<p align="center">
+<img src="./media/demo_light_mode.png" alt="Light Mode" width="800">
+</p>
+
+*Toggle between dark and light themes!*
 
 ---
 
