@@ -10,26 +10,35 @@
 
 ---
 
-## ✨ Demo
+## ✨ Screenshots
 
+### 🌙 Dark Mode - Chat Interface
 <p align="center">
-<img src="./media/demo_screenshot.png" alt="AgentSeek 2 Demo" width="800">
+<img src="./media/demo_screenshot.png" alt="AgentSeek 2 Dark Mode" width="800">
 </p>
 
-*Ask Jarvis anything — code, web search, file management, and more!*
+*Chat with Jarvis AI - code generation, web search, and file management!*
 
-### 📺 Watch the Full Demo
-👉 [**Download Demo Video (WebP)**](./media/full_demo.webp) - Shows all features in action!
+### ☀️ Light Mode - AI Conversation  
+<p align="center">
+<img src="./media/demo_light_mode.png" alt="AgentSeek 2 Light Mode" width="800">
+</p>
 
-**Features in the demo:**
-- 💬 Chat Interface with Jarvis AI
-- 💻 Code Generation (Python programs)
-- 🌐 Browser View with web search
-- 📝 Editor View for code editing
-- 📜 Chat History panel
-- 📁 File Browser for workspace
-- ⚙️ Settings modal for LLM configuration
-- 🌙 Theme Toggle (Light/Dark mode)
+*Switch between light and dark themes with one click!*
+
+### ⚙️ Settings - LLM Configuration
+<p align="center">
+<img src="./media/demo_settings.png" alt="Settings Modal" width="800">
+</p>
+
+*Configure your local LLM provider - supports Ollama, LM Studio, and more!*
+
+### 📁 File Browser - Workspace Explorer
+<p align="center">
+<img src="./media/demo_files.png" alt="File Browser" width="800">
+</p>
+
+*Browse and manage your workspace files directly from the interface!*
 
 ---
 
@@ -43,6 +52,9 @@
 | 🧠 **Smart Routing** | Automatically selects the best agent for your task |
 | 📋 **Task Planning** | Breaks complex projects into manageable steps |
 | 🎙️ **Voice Enabled** | Speech-to-text for hands-free interaction |
+| 🌙 **Dark/Light Mode** | Beautiful UI with theme toggle |
+| 📁 **File Browser** | Explore and manage workspace files |
+| ⚙️ **Configurable** | Easy LLM provider setup |
 
 ---
 
