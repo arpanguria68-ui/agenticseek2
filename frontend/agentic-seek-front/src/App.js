@@ -4,6 +4,9 @@ import axios from "axios";
 import "./App.css";
 import { ThemeToggle } from "./components/ThemeToggle";
 import { ResizableLayout } from "./components/ResizableLayout";
+import { SettingsModal } from "./components/SettingsModal";
+import { ChatHistory } from "./components/ChatHistory";
+import { FileBrowser } from "./components/FileBrowser";
 import faviconPng from "./logo.png";
 
 const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
@@ -19,6 +22,10 @@ function App() {
   const [isOnline, setIsOnline] = useState(false);
   const [status, setStatus] = useState("Agents ready");
   const [expandedReasoning, setExpandedReasoning] = useState(new Set());
+  const [isSettingsOpen, setIsSettingsOpen] = useState(false);
+  const [isHistoryOpen, setIsHistoryOpen] = useState(false);
+  const [isFileBrowserOpen, setIsFileBrowserOpen] = useState(false);
+  const [currentSessionId, setCurrentSessionId] = useState(null);
   const messagesEndRef = useRef(null);
 
   const fetchLatestAnswer = useCallback(async () => {
@@ -200,15 +207,69 @@ function App() {
     }
   };
 
+  const handleSessionLoad = async (sessionId, data) => {
+    console.log("Session loaded:", sessionId, data);
+    setCurrentSessionId(sessionId);
+    setIsHistoryOpen(false);
+    setStatus(`Loading session ${sessionId}...`);
+
+    // Fetch the full session to get messages
+    try {
+      const res = await axios.get(`${BACKEND_URL}/sessions/${sessionId}`);
+      const sessionData = res.data;
+
+      // Extract messages from all agents and display user/assistant pairs
+      const loadedMessages = [];
+      const agentTypes = ['planner_agent', 'casual_agent', 'code_agent', 'file_agent', 'browser_agent'];
+
+      for (const agentType of agentTypes) {
+        if (sessionData.agents && sessionData.agents[agentType]) {
+          const agentMessages = sessionData.agents[agentType].messages || [];
+          for (const msg of agentMessages) {
+            if (msg.role === 'user') {
+              loadedMessages.push({ type: 'user', content: msg.content });
+            } else if (msg.role === 'assistant') {
+              loadedMessages.push({
+                type: 'agent',
+                content: msg.content,
+                agentName: agentType.replace('_agent', '').charAt(0).toUpperCase() + agentType.replace('_agent', '').slice(1)
+              });
+            }
+          }
+        }
+      }
+
+      // Remove duplicates based on content
+      const uniqueMessages = loadedMessages.filter((msg, index, self) =>
+        index === self.findIndex((m) => m.content === msg.content)
+      );
+
+      setMessages(uniqueMessages);
+      setStatus(`Session loaded: ${uniqueMessages.length} messages`);
+    } catch (err) {
+      console.error("Error loading session details:", err);
+      setMessages([]);
+      setStatus(`Loaded session ${sessionId}`);
+    }
+  };
+
+  const handleNewSession = (sessionId) => {
+    console.log("New session created:", sessionId);
+    setCurrentSessionId(sessionId);
+    setMessages([]);
+    setIsHistoryOpen(false);
+    setStatus("New chat session started");
+  };
+
   return (
     <div className="app">
       <header className="header">
         <div className="header-brand">
           <div className="logo-container">
-            <img src={faviconPng} alt="AgenticSeek" className="logo-icon" />
+            <img src={faviconPng} alt="AgenticSeek2" className="logo-icon" />
           </div>
           <div className="brand-text">
-            <h1>AgenticSeek</h1>
+            <h1>AgenticSeek2</h1>
           </div>
         </div>
         <div className="header-status">
@@ -222,6 +283,29 @@ function App() {
           </div>
         </div>
         <div className="header-actions">
+          <button
+            className="action-button history-button"
+            onClick={() => setIsHistoryOpen(true)}
+            aria-label="Chat History"
+            title="Chat History"
+          >
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+              <circle cx="12" cy="12" r="10"></circle>
+              <polyline points="12 6 12 12 16 14"></polyline>
+            </svg>
+            <span className="action-text">History</span>
+          </button>
+          <button
+            className="action-button files-button"
+            onClick={() => setIsFileBrowserOpen(true)}
+            aria-label="Workspace Files"
+            title="Workspace Files"
+          >
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+              <path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"></path>
+            </svg>
+            <span className="action-text">Files</span>
+          </button>
           <a
             href="https://github.com/Fosowl/agenticSeek"
             target="_blank"
@@ -234,6 +318,16 @@ function App() {
             </svg>
             <span className="action-text">GitHub</span>
           </a>
+          <button
+            className="action-button settings-button"
+            onClick={() => setIsSettingsOpen(true)}
+            aria-label="Settings"
+          >
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+              <circle cx="12" cy="12" r="3"></circle>
+              <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path>
+            </svg>
+          </button>
           <div>
             <ThemeToggle />
           </div>
@@ -252,13 +346,12 @@ function App() {
                 messages.map((msg, index) => (
                   <div
                     key={index}
-                    className={`message ${
-                      msg.type === "user"
-                        ? "user-message"
-                        : msg.type === "agent"
+                    className={`message ${msg.type === "user"
+                      ? "user-message"
+                      : msg.type === "agent"
                         ? "agent-message"
                         : "error-message"
-                    }`}
+                      }`}
                   >
                     <div className="message-header">
                       {msg.type === "agent" && (
@@ -370,8 +463,8 @@ function App() {
               {currentView === "blocks" ? (
                 <div className="blocks">
                   {responseData &&
-                  responseData.blocks &&
-                  Object.values(responseData.blocks).length > 0 ? (
+                    responseData.blocks &&
+                    Object.values(responseData.blocks).length > 0 ? (
                     Object.values(responseData.blocks).map((block, index) => (
                       <div key={index} className="block">
                         <p className="block-tool">Tool: {block.tool_type}</p>
@@ -410,6 +503,20 @@ function App() {
           </div>
         </ResizableLayout>
       </main>
+      <SettingsModal
+        isOpen={isSettingsOpen}
+        onClose={() => setIsSettingsOpen(false)}
+      />
+      <ChatHistory
+        isOpen={isHistoryOpen}
+        onClose={() => setIsHistoryOpen(false)}
+        onSessionLoad={handleSessionLoad}
+        onNewSession={handleNewSession}
+      />
+      <FileBrowser
+        isOpen={isFileBrowserOpen}
+        onClose={() => setIsFileBrowserOpen(false)}
+      />
     </div>
   );
 }

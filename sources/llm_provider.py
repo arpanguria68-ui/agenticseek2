@@ -14,8 +14,11 @@ from openai import OpenAI
 from sources.logger import Logger
 from sources.utility import pretty_print, animate_thinking
 
+
 class Provider:
-    def __init__(self, provider_name, model, server_address="127.0.0.1:5000", is_local=False):
+    def __init__(
+        self, provider_name, model, server_address="127.0.0.1:5000", is_local=False
+    ):
         self.provider_name = provider_name.lower()
         self.model = model
         self.is_local = is_local
@@ -32,19 +35,32 @@ class Provider:
             "together": self.together_fn,
             "dsk_deepseek": self.dsk_deepseek,
             "openrouter": self.openrouter_fn,
-            "test": self.test_fn
+            "test": self.test_fn,
         }
         self.logger = Logger("provider.log")
         self.api_key = None
         self.internal_url, self.in_docker = self.get_internal_url()
-        self.unsafe_providers = ["openai", "deepseek", "dsk_deepseek", "together", "google", "openrouter"]
+        self.unsafe_providers = [
+            "openai",
+            "deepseek",
+            "dsk_deepseek",
+            "together",
+            "google",
+            "openrouter",
+        ]
         if self.provider_name not in self.available_providers:
             raise ValueError(f"Unknown provider: {provider_name}")
         if self.provider_name in self.unsafe_providers and self.is_local == False:
-            pretty_print("Warning: you are using an API provider. You data will be sent to the cloud.", color="warning")
+            pretty_print(
+                "Warning: you are using an API provider. You data will be sent to the cloud.",
+                color="warning",
+            )
             self.api_key = self.get_api_key(self.provider_name)
         elif self.provider_name != "ollama":
-            pretty_print(f"Provider: {provider_name} initialized at {self.server_ip}", color="success")
+            pretty_print(
+                f"Provider: {provider_name} initialized at {self.server_ip}",
+                color="success",
+            )
 
     def get_model_name(self) -> str:
         return self.model
@@ -54,14 +70,17 @@ class Provider:
         api_key_var = f"{provider.upper()}_API_KEY"
         api_key = os.getenv(api_key_var)
         if not api_key:
-            pretty_print(f"API key {api_key_var} not found in .env file. Please add it", color="warning")
+            pretty_print(
+                f"API key {api_key_var} not found in .env file. Please add it",
+                color="warning",
+            )
             exit(1)
         return api_key
-    
+
     def get_internal_url(self):
         load_dotenv()
         url = os.getenv("DOCKER_INTERNAL_URL")
-        if not url: # running on host
+        if not url:  # running on host
             return "http://localhost", False
         return url, True
 
@@ -79,10 +98,13 @@ class Provider:
         except ConnectionError as e:
             raise ConnectionError(f"{str(e)}\nConnection to {self.server_ip} failed.")
         except AttributeError as e:
-            raise NotImplementedError(f"{str(e)}\nIs {self.provider_name} implemented ?")
+            raise NotImplementedError(
+                f"{str(e)}\nIs {self.provider_name} implemented ?"
+            )
         except ModuleNotFoundError as e:
             raise ModuleNotFoundError(
-                f"{str(e)}\nA import related to provider {self.provider_name} was not found. Is it installed ?")
+                f"{str(e)}\nA import related to provider {self.provider_name} was not found. Is it installed ?"
+            )
         except Exception as e:
             if "try again later" in str(e).lower():
                 return f"{self.provider_name} server is overloaded. Please try again later."
@@ -97,7 +119,11 @@ class Provider:
         """
         if not address:
             return False
-        parsed = urlparse(address if address.startswith(('http://', 'https://')) else f'http://{address}')
+        parsed = urlparse(
+            address
+            if address.startswith(("http://", "https://"))
+            else f"http://{address}"
+        )
 
         hostname = parsed.hostname or address
         if "127.0.0.1" in address or "localhost" in address:
@@ -107,10 +133,12 @@ class Provider:
         except socket.gaierror:
             self.logger.error(f"Cannot resolve: {hostname}")
             return False
-        param = '-n' if platform.system().lower() == 'windows' else '-c'
-        command = ['ping', param, '1', ip_address]
+        param = "-n" if platform.system().lower() == "windows" else "-c"
+        command = ["ping", param, "1", ip_address]
         try:
-            result = subprocess.run(command, stdout=subprocess.PIPE, stderr=subprocess.PIPE, timeout=timeout)
+            result = subprocess.run(
+                command, stdout=subprocess.PIPE, stderr=subprocess.PIPE, timeout=timeout
+            )
             return result.returncode == 0
         except (subprocess.TimeoutExpired, subprocess.SubprocessError) as e:
             return False
@@ -143,14 +171,17 @@ class Provider:
                     pretty_print(f"HTTP request failed: {str(e)}", color="failure")
                     break
                 except ValueError as e:
-                    pretty_print(f"Failed to parse JSON response: {str(e)}", color="failure")
+                    pretty_print(
+                        f"Failed to parse JSON response: {str(e)}", color="failure"
+                    )
                     break
                 except Exception as e:
                     pretty_print(f"An error occurred: {str(e)}", color="failure")
                     break
         except KeyError as e:
             raise Exception(
-                f"{str(e)}\nError occured with server route. Are you using the correct address for the config.ini provider?") from e
+                f"{str(e)}\nError occured with server route. Are you using the correct address for the config.ini provider?"
+            ) from e
         except Exception as e:
             raise e
         return thought
@@ -160,7 +191,11 @@ class Provider:
         Use local or remote Ollama server to generate text.
         """
         thought = ""
-        host = f"{self.internal_url}:11434" if self.is_local else f"http://{self.server_address}"
+        host = (
+            f"{self.internal_url}:11434"
+            if self.is_local
+            else f"http://{self.server_address}"
+        )
         client = OllamaClient(host=host)
 
         try:
@@ -178,7 +213,7 @@ class Provider:
                 f"\nOllama connection failed at {host}. Check if the server is running."
             ) from e
         except Exception as e:
-            if hasattr(e, 'status_code') and e.status_code == 404:
+            if hasattr(e, "status_code") and e.status_code == 404:
                 animate_thinking(f"Downloading {self.model}...")
                 client.pull(self.model)
                 self.ollama_fn(history, verbose)
@@ -195,9 +230,8 @@ class Provider:
         Use huggingface to generate text.
         """
         from huggingface_hub import InferenceClient
-        client = InferenceClient(
-            api_key=self.get_api_key("huggingface")
-        )
+
+        client = InferenceClient(api_key=self.get_api_key("huggingface"))
         completion = client.chat.completions.create(
             model=self.model,
             messages=history,
@@ -213,10 +247,12 @@ class Provider:
         base_url = self.server_ip
         if self.is_local and self.in_docker:
             try:
-                host, port = base_url.split(':')
+                host, port = base_url.split(":")
             except Exception as e:
                 port = "8000"
-            client = OpenAI(api_key=self.api_key, base_url=f"{self.internal_url}:{port}")
+            client = OpenAI(
+                api_key=self.api_key, base_url=f"{self.internal_url}:{port}"
+            )
         elif self.is_local:
             client = OpenAI(api_key=self.api_key, base_url=f"http://{base_url}")
         else:
@@ -246,9 +282,9 @@ class Provider:
         system_message = None
         messages = []
         for message in history:
-            clean_message = {'role': message['role'], 'content': message['content']}
-            if message['role'] == 'system':
-                system_message = message['content']
+            clean_message = {"role": message["role"], "content": message["content"]}
+            if message["role"] == "system":
+                system_message = message["content"]
             else:
                 messages.append(clean_message)
 
@@ -257,7 +293,7 @@ class Provider:
                 model=self.model,
                 max_tokens=1024,
                 messages=messages,
-                system=system_message
+                system=system_message,
             )
             if response is None:
                 raise Exception("Anthropic response is empty.")
@@ -274,9 +310,14 @@ class Provider:
         """
         base_url = self.server_ip
         if self.is_local:
-            raise Exception("Google Gemini is not available for local use. Change config.ini")
+            raise Exception(
+                "Google Gemini is not available for local use. Change config.ini"
+            )
 
-        client = OpenAI(api_key=self.api_key, base_url="https://generativelanguage.googleapis.com/v1beta/openai/")
+        client = OpenAI(
+            api_key=self.api_key,
+            base_url="https://generativelanguage.googleapis.com/v1beta/openai/",
+        )
         try:
             response = client.chat.completions.create(
                 model=self.model,
@@ -296,9 +337,12 @@ class Provider:
         Use together AI for completion
         """
         from together import Together
+
         client = Together(api_key=self.api_key)
         if self.is_local:
-            raise Exception("Together AI is not available for local use. Change config.ini")
+            raise Exception(
+                "Together AI is not available for local use. Change config.ini"
+            )
 
         try:
             response = client.chat.completions.create(
@@ -320,12 +364,12 @@ class Provider:
         """
         client = OpenAI(api_key=self.api_key, base_url="https://api.deepseek.com")
         if self.is_local:
-            raise Exception("Deepseek (API) is not available for local use. Change config.ini")
+            raise Exception(
+                "Deepseek (API) is not available for local use. Change config.ini"
+            )
         try:
             response = client.chat.completions.create(
-                model="deepseek-chat",
-                messages=history,
-                stream=False
+                model="deepseek-chat", messages=history, stream=False
             )
             thought = response.choices[0].message.content
             if verbose:
@@ -341,8 +385,11 @@ class Provider:
         if self.in_docker:
             # Extract port from server_address if present
             port = "1234"  # default
-            if ":" in self.server_address:
-                port = self.server_address.split(":")[1]
+            clean_addr = self.server_address.replace("http://", "").replace(
+                "https://", ""
+            )
+            if ":" in clean_addr:
+                port = clean_addr.split(":")[-1]
             url = f"{self.internal_url}:{port}"
         else:
             url = f"http://{self.server_ip}"
@@ -351,19 +398,24 @@ class Provider:
             "messages": history,
             "temperature": 0.7,
             "max_tokens": 4096,
-            "model": self.model
+            "model": self.model,
         }
 
         try:
-            response = requests.post(route_start, json=payload, timeout=30)
+            # increased timeout for reasoning models on cpu
+            response = requests.post(route_start, json=payload, timeout=1200)
             if response.status_code != 200:
-                raise Exception(f"LM Studio returned status {response.status_code}: {response.text}")
+                raise Exception(
+                    f"LM Studio returned status {response.status_code}: {response.text}"
+                )
             if not response.text.strip():
                 raise Exception("LM Studio returned empty response")
             try:
                 result = response.json()
             except ValueError as json_err:
-                raise Exception(f"Invalid JSON from LM Studio: {response.text[:200]}") from json_err
+                raise Exception(
+                    f"Invalid JSON from LM Studio: {response.text[:200]}"
+                ) from json_err
 
             if verbose:
                 print("Response from LM Studio:", result)
@@ -373,14 +425,28 @@ class Provider:
 
             message = choices[0].get("message", {})
             content = message.get("content", "")
+
+            # Additional debug logging
+            if verbose or not content:
+                print(f"DEBUG: LM Studio raw content length: {len(content)}")
+                print(f"DEBUG: LM Studio raw content start: {content[:100]}")
+
             if not content:
-                raise Exception(f"Empty content in LM Studio response: {result}")
+                # Backup: try to see if there is a 'reasoning' field or similar non-standard field
+                if "reasoning" in message:
+                    content = f"<think>{message['reasoning']}</think>"
+                else:
+                    raise Exception(f"Empty content in LM Studio response: {result}")
             return content
 
         except requests.exceptions.Timeout:
-            raise Exception("LM Studio request timed out - check if server is responsive")
+            raise Exception(
+                "LM Studio request timed out - check if server is responsive"
+            )
         except requests.exceptions.ConnectionError:
-            raise Exception(f"Cannot connect to LM Studio at {route_start} - check if server is running")
+            raise Exception(
+                f"Cannot connect to LM Studio at {route_start} - check if server is running"
+            )
         except requests.exceptions.RequestException as e:
             raise Exception(f"HTTP request failed: {str(e)}") from e
         except Exception as e:
@@ -397,7 +463,9 @@ class Provider:
         if self.is_local:
             # This case should ideally not be reached if unsafe_providers is set correctly
             # and is_local is False in config for openrouter
-            raise Exception("OpenRouter is not available for local use. Change config.ini")
+            raise Exception(
+                "OpenRouter is not available for local use. Change config.ini"
+            )
         try:
             response = client.chat.completions.create(
                 model=self.model,
@@ -424,26 +492,35 @@ class Provider:
             RateLimitError,
             NetworkError,
             CloudflareError,
-            APIError
+            APIError,
         )
+
         thought = ""
-        message = '\n---\n'.join([f"{msg['role']}: {msg['content']}" for msg in history])
+        message = "\n---\n".join(
+            [f"{msg['role']}: {msg['content']}" for msg in history]
+        )
 
         try:
             api = DeepSeekAPI(self.api_key)
             chat_id = api.create_chat_session()
             for chunk in api.chat_completion(chat_id, message):
-                if chunk['type'] == 'text':
-                    thought += chunk['content']
+                if chunk["type"] == "text":
+                    thought += chunk["content"]
             return thought
         except AuthenticationError:
-            raise AuthenticationError("Authentication failed. Please check your token.") from e
+            raise AuthenticationError(
+                "Authentication failed. Please check your token."
+            ) from e
         except RateLimitError:
-            raise RateLimitError("Rate limit exceeded. Please wait before making more requests.") from e
+            raise RateLimitError(
+                "Rate limit exceeded. Please wait before making more requests."
+            ) from e
         except CloudflareError as e:
             raise CloudflareError(f"Cloudflare protection encountered: {str(e)}") from e
         except NetworkError:
-            raise NetworkError("Network error occurred. Check your internet connection.") from e
+            raise NetworkError(
+                "Network error occurred. Check your internet connection."
+            ) from e
         except APIError as e:
             raise APIError(f"API error occurred: {str(e)}") from e
         return None
